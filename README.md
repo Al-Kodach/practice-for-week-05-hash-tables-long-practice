@@ -12,7 +12,7 @@ problems where they are an optimal tool to utilize. You will also:
   Hash Table
 - Use hash tables to improve time complexity through caching (memoization and
   tabulation)
-- Select a Hash Table when it is the appropriate tool for solving a problem
+- Select a Hash Table when it is the appropriate tool for solving a problem 
 
 ## Setup
 

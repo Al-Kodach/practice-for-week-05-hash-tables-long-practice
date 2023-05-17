@@ -4,7 +4,7 @@ const HashTable = require("../phases/01-implementation");
 
 describe ('Phase 1 - Hash table implementation', function () {
 
-  let hashTable;
+  let hashTable; 
 
   beforeEach(function () {
 
