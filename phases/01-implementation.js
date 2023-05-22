@@ -36,44 +36,47 @@ class HashTable { // get O(1), set O(1), deleteKey O(1)
     // Your code here
     let loadFactor = this.count / this.capacity;
 
+    // we increase size of array when time factor exceed 700ms;
     while (loadFactor >= 0.7) {
       this.resize();
       loadFactor = this.count / this.capacity;
     }
 
-    const newData = new KeyValuePair(key, value);
-    const index = this.hashMod(key);
-    const el = this.data[index];
+    const newNode = new KeyValuePair(key, value),
+      idx = this.hashMod(key);
 
-    if ( el ) {
-      let curr = el;
-
-      while (curr) {
-
-        if (curr.key === key) {
-          curr.value = value;
-          curr = null;
-        } else {
-
-          if (!curr.next) {
-            this.data[index] = newData
-            this.data[index].next = el;
-            this.count++;
-          }
-          curr = curr.next;
+      // check if current index is not occopied.
+      if (!this.data[idx]) {
+        this.data[idx] = newNode;
+        this.count++;
+        return;
+      }
+      
+      // if occupied.
+      let oldNode = this.data[idx];
+      
+      // we update value if same key is found;
+      while (oldNode) {
+        if (oldNode.key === key) {
+          oldNode.value = value;
+          return;
         }
+        // we also check for linked nodes;
+        oldNode = oldNode.next;
       }
 
-    } else {
-      this.data[index] = newData;
+      // if key is not found
+      // we handle collision
+      newNode.next = this.data[idx];
+      this.data[idx] = newNode;
       this.count++;
-    }
-
   }
 
 
   read(key) {
     // Your code here
+    if (this.count === 0) return 'not found';
+
     const index = this.hashMod(key);
     let curr = this.data[index];
 
@@ -120,30 +123,52 @@ class HashTable { // get O(1), set O(1), deleteKey O(1)
 
   delete(key) {
     // Your code here
-    const index = this.hashMod(key);
+    if (this.count === 0) return 'Key not found';
+    if ( !(this.read(key)) ) return 'Key not found';
 
-    let curr = this.data[index];
+    // not will run below this comment if no data is found 
+    // with the help of the this.read(key) method.
 
-    if (!this.read(key)) {
-      return 'Key not found';
+    const idx = this.hashMod(key);
+    
+    // if node to be deleted is the head
+    // we replace head with linked node.
+    // if node to be deleted is found at the middle
+    // we link the prev and next node.
+    // this will automatically be remove from the data.
+    
+    let cur = this.data[idx], 
+      prev = null;
+    
+    while (cur) {
+
+      // if cur node has same key
+      // we dislink current from next and previous nodes.
+      if (cur.key === key) {
+        // check if any previous record,
+        // change previous next node to cur next node.
+        if (prev) {
+          prev.next = cur.next;
+        } 
+        // when the head is the node to be remove
+        else {
+          this.data[idx] = cur.next;
+        }
+
+        // decrement couter and break the loop.
+        this.count--;
+        return;
+      }
+
+      // if node not found, set current to be previous
+      if (cur.next) {
+        prev = cur;
+      }
+
+      // we continue with our loop.
+      cur = cur.next;
     }
-
-    while (curr.key !== key && curr.next.key !== key) {
-      curr = curr.next;
-    }
-
-    if (curr.key === key) {
-      // If head element is to be deleted
-      const newHead = curr.next;
-      curr.next = null;
-      this.data[index] = newHead;
-      this.count--;
-    } else {
-      const newNext = curr.next.next;
-      curr.next.next = null;
-      curr.next = newNext;
-      this.count--;
-    }
+    
   }
 }
 
